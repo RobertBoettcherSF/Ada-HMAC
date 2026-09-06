@@ -19,7 +19,7 @@ procedure Tests is
    -- A predictable mock hash function to allow deterministic testing
    -- of the HMAC structural requirements, padding, and XOR masks.
    function Fake_Hash (Data : Byte_Array) return Byte_Array is
-      Output : Byte_Array (1 .. 4) := (0, 0, 0, 0);
+      Output : Byte_Array (1 .. 4) := [0, 0, 0, 0];
       Sum    : Byte := 0;
       Xor_V  : Byte := 0;
    begin
@@ -49,7 +49,7 @@ begin
 
    -- TEST 1: Normalize Short Key (Zero Padding)
    declare
-      Key     : constant Byte_Array := (16#01#, 16#02#);
+      Key     : constant Byte_Array := [16#01#, 16#02#];
       K_Prime : constant Byte_Array := Test_HMAC.Normalize_Key (Key);
    begin
       Put_Line ("TEST 1 — Normalize Short Key");
@@ -60,7 +60,7 @@ begin
 
    -- TEST 2: Normalize Exact Length Key
    declare
-      Key     : constant Byte_Array := (1, 2, 3, 4, 5, 6, 7, 8);
+      Key     : constant Byte_Array := [1, 2, 3, 4, 5, 6, 7, 8];
       K_Prime : constant Byte_Array := Test_HMAC.Normalize_Key (Key);
    begin
       Put_Line ("TEST 2 — Normalize Exact Block Size Key");
@@ -71,7 +71,7 @@ begin
 
    -- TEST 3: Normalize Long Key (Pre-Hashing required by RFC)
    declare
-      Key     : constant Byte_Array (1 .. 10) := (others => 16#AA#);
+      Key     : constant Byte_Array (1 .. 10) := [others => 16#AA#];
       K_Prime : constant Byte_Array := Test_HMAC.Normalize_Key (Key);
    begin
       Put_Line ("TEST 3 — Normalize Long Key (Hashing)");
@@ -82,7 +82,7 @@ begin
 
    -- TEST 4: Normalize Empty Key
    declare
-      Key     : constant Byte_Array (1 .. 0) := (others => 0);
+      Key     : constant Byte_Array (1 .. 0) := [others => 0];
       K_Prime : constant Byte_Array := Test_HMAC.Normalize_Key (Key);
    begin
       Put_Line ("TEST 4 — Normalize Empty Key");
@@ -93,8 +93,8 @@ begin
 
    -- TEST 5: Compute HMAC on Empty Data
    declare
-      Key    : constant Byte_Array (1 .. 0) := (others => 0);
-      Msg    : constant Byte_Array (1 .. 0) := (others => 0);
+      Key    : constant Byte_Array (1 .. 0) := [others => 0];
+      Msg    : constant Byte_Array (1 .. 0) := [others => 0];
       Result : constant Byte_Array := Test_HMAC.Compute (Key, Msg);
    begin
       Put_Line ("TEST 5 — Compute Empty Key and Message");
@@ -105,22 +105,22 @@ begin
 
    -- TEST 6: Compute Normal Configuration
    declare
-      Key    : constant Byte_Array := (16#01#, 16#02#);
-      Msg    : constant Byte_Array := (16#10#, 16#20#);
+      Key    : constant Byte_Array := [16#01#, 16#02#];
+      Msg    : constant Byte_Array := [16#10#, 16#20#];
       Result : constant Byte_Array := Test_HMAC.Compute (Key, Msg);
    begin
       Put_Line ("TEST 6 — Compute Normal Inputs");
       Check ("6.1 Valid array bounds generated", Result'Length = 4);
       Check ("6.2 Output is stable (idempotency)", Result = Test_HMAC.Compute (Key, Msg));
-      Check ("6.3 Differs from empty evaluation", Result /= Test_HMAC.Compute ((1..0 => 0), (1..0 => 0)));
+      Check ("6.3 Differs from empty evaluation", Result /= Test_HMAC.Compute ([1..0 => 0], [1..0 => 0]));
    end;
 
    -- TEST 7: String Interface Variant Verification
    declare
       Key_Str   : constant String := "AB";
       Msg_Str   : constant String := "CD";
-      Key_Bytes : constant Byte_Array := (16#41#, 16#42#);
-      Msg_Bytes : constant Byte_Array := (16#43#, 16#44#);
+      Key_Bytes : constant Byte_Array := [16#41#, 16#42#];
+      Msg_Bytes : constant Byte_Array := [16#43#, 16#44#];
       Res_Str   : constant Byte_Array := Test_HMAC.Compute_String (Key_Str, Msg_Str);
       Res_Bytes : constant Byte_Array := Test_HMAC.Compute (Key_Bytes, Msg_Bytes);
    begin
@@ -132,9 +132,9 @@ begin
 
    -- TEST 8: Output Sensitivity to Key Perturbation
    declare
-      Key1 : constant Byte_Array := (16#01#);
-      Key2 : constant Byte_Array := (16#02#);
-      Msg  : constant Byte_Array := (16#10#, 16#20#);
+      Key1 : constant Byte_Array := [16#01#];
+      Key2 : constant Byte_Array := [16#02#];
+      Msg  : constant Byte_Array := [16#10#, 16#20#];
       Res1 : constant Byte_Array := Test_HMAC.Compute (Key1, Msg);
       Res2 : constant Byte_Array := Test_HMAC.Compute (Key2, Msg);
    begin
@@ -146,9 +146,9 @@ begin
 
    -- TEST 9: Output Sensitivity to Message Perturbation
    declare
-      Key  : constant Byte_Array := (16#01#);
-      Msg1 : constant Byte_Array := (16#10#, 16#20#);
-      Msg2 : constant Byte_Array := (16#10#, 16#30#);
+      Key  : constant Byte_Array := [16#01#];
+      Msg1 : constant Byte_Array := [16#10#, 16#20#];
+      Msg2 : constant Byte_Array := [16#10#, 16#30#];
       Res1 : constant Byte_Array := Test_HMAC.Compute (Key, Msg1);
       Res2 : constant Byte_Array := Test_HMAC.Compute (Key, Msg2);
    begin
@@ -160,8 +160,8 @@ begin
 
    -- TEST 10: Structural Equivalence for Long Keys (RFC Core Requirement)
    declare
-      Long_Key   : constant Byte_Array (1 .. 10) := (others => 16#AA#);
-      Msg        : constant Byte_Array := (16#11#, 16#22#);
+      Long_Key   : constant Byte_Array (1 .. 10) := [others => 16#AA#];
+      Msg        : constant Byte_Array := [16#11#, 16#22#];
       Hashed_Key : constant Byte_Array := Fake_Hash (Long_Key);
       Res_Long   : constant Byte_Array := Test_HMAC.Compute (Long_Key, Msg);
       Res_Hashed : constant Byte_Array := Test_HMAC.Compute (Hashed_Key, Msg);
@@ -174,8 +174,8 @@ begin
 
    -- TEST 11: Extreme Message Length Processing
    declare
-      Key : constant Byte_Array := (16#99#);
-      Msg : constant Byte_Array (1 .. 1000) := (others => 16#55#);
+      Key : constant Byte_Array := [16#99#];
+      Msg : constant Byte_Array (1 .. 1000) := [others => 16#55#];
       Res : constant Byte_Array := Test_HMAC.Compute (Key, Msg);
    begin
       Put_Line ("TEST 11 — Large Message Bounds Formatting");
@@ -186,8 +186,8 @@ begin
 
    -- TEST 12: Single Element Vectors
    declare
-      Key : constant Byte_Array := (1 => 16#FF#);
-      Msg : constant Byte_Array := (1 => 16#00#);
+      Key : constant Byte_Array := [1 => 16#FF#];
+      Msg : constant Byte_Array := [1 => 16#00#];
       Res : constant Byte_Array := Test_HMAC.Compute (Key, Msg);
    begin
       Put_Line ("TEST 12 — Single Element Vectors");
@@ -199,7 +199,7 @@ begin
    -- TEST 13: String Interface Null Safety
    declare
       Res_Str   : constant Byte_Array := Test_HMAC.Compute_String ("", "");
-      Res_Bytes : constant Byte_Array := Test_HMAC.Compute ((1..0 => 0), (1..0 => 0));
+      Res_Bytes : constant Byte_Array := Test_HMAC.Compute ([1..0 => 0], [1..0 => 0]);
    begin
       Put_Line ("TEST 13 — Empty String Handling");
       Check ("13.1 Empty string handles cleanly", Res_Str'Length = 4);
