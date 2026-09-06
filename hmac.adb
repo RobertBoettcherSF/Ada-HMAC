@@ -12,7 +12,7 @@ package body HMAC is
       -- If Key < Block_Size, it simply pads with 0s.
       -------------------------------------------------------------------------
       function Normalize_Key (Key : Byte_Array) return Byte_Array is
-         Result : Byte_Array (1 .. Block_Size) := (others => 0);
+         Result : Byte_Array (1 .. Block_Size) := [others => 0];
       begin
          if Key'Length > Block_Size then
             -- Hash keys that are longer than the block size
