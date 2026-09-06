@@ -148,7 +148,7 @@ begin
    declare
       Key  : constant Byte_Array := [16#01#];
       Msg1 : constant Byte_Array := [16#10#, 16#20#];
-      Msg2 : constant Byte_Array := [16#10#, 16#30#];
+      Msg2 : constant Byte_Array := [16#99#, 16#88#];
       Res1 : constant Byte_Array := Test_HMAC.Compute (Key, Msg1);
       Res2 : constant Byte_Array := Test_HMAC.Compute (Key, Msg2);
    begin
